@@ -1,4 +1,5 @@
 using Dokkan.Api;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDependencies(builder.Configuration);
 
+builder.Host.UseSerilog((context, configurations) =>
+{
+    configurations.ReadFrom.Configuration(context.Configuration);
+});
+
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
+
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();

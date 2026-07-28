@@ -17,7 +17,6 @@ public static class ResultExtensions
             Title = ReasonPhrases.GetReasonPhrase(statusCode),
             Status=statusCode,
             Detail=result.Error.Description
-
         };
 
         problemDetails.Extensions["code"] = result.Error.Code;
@@ -25,4 +24,3 @@ public static class ResultExtensions
         return new ObjectResult(problemDetails) { StatusCode=statusCode};
     }
 }
-
