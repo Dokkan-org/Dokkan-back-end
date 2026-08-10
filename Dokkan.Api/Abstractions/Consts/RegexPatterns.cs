@@ -1,0 +1,7 @@
+﻿namespace Dokkan.Api.Abstractions.Consts;
+
+public static class RegexPatterns
+{
+    public const string Password =
+        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$";
+}
