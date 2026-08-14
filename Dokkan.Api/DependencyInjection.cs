@@ -31,6 +31,7 @@ public static class DependencyInjection
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IEmailSender, EmailService>();
+        services.AddScoped<ICategoryService, CategoryService>();
 
 
         var allowedOrigins = configuration.GetSection("AllowedOrigins").Get<string[]>();

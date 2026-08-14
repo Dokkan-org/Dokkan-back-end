@@ -1,4 +1,5 @@
 ﻿using Dokkan.Api.Contracts.Authentication;
+using Dokkan.Api.Contracts.Category;
 using Dokkan.Api.Contracts.Users;
 using Dokkan.Api.Entities;
 using Mapster;
@@ -11,5 +12,8 @@ public class MappingConfigurations : IRegister
     {
         config.NewConfig<RegisterRequest, ApplicationUser>()
             .Map(dest => dest.UserName, src => src.Email);
+
+        config.NewConfig<CategoryRequest, Category>()
+            .Map(dest => dest.IsActive, _ => true);
     }
 }
