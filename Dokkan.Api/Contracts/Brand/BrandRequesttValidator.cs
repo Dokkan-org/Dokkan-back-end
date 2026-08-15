@@ -2,9 +2,9 @@
 
 namespace Dokkan.Api.Contracts.Category;
 
-public class CategoryRequestValidator: AbstractValidator<CategoryRequest>
+public class BrandRequesttValidator : AbstractValidator<BrandRequest>
 {
-    public CategoryRequestValidator()
+    public BrandRequesttValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()

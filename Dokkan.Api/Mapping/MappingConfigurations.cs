@@ -15,5 +15,8 @@ public class MappingConfigurations : IRegister
 
         config.NewConfig<CategoryRequest, Category>()
             .Map(dest => dest.IsActive, _ => true);
+
+        config.NewConfig<BrandRequest, Brand>()
+            .Map(dest => dest.IsActive, _ => true);
     }
 }
