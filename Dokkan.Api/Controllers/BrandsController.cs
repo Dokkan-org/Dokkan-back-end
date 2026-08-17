@@ -1,9 +1,7 @@
 ﻿using Dokkan.Api.Abstractions;
-using Dokkan.Api.Contracts.Category;
+using Dokkan.Api.Contracts.Brand;
 using Dokkan.Api.Contracts.Common;
 using Dokkan.Api.Services;
-using Mapster;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dokkan.Api.Controllers;
@@ -15,9 +13,15 @@ public class BrandsController(IBrandService service) : ControllerBase
     private readonly IBrandService _brandService = service;
 
     [HttpGet()]
-    public async Task<IActionResult> GetAll([FromQuery]RequestFilters request,bool? isActive,CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromQuery]RequestFilters request,CancellationToken cancellationToken)
     {
-        var result= await _brandService.GetAllAsync(request,isActive, cancellationToken);
+        var result= await _brandService.GetAllAsync(request, cancellationToken);
+        return Ok(result.Value);
+    }
+    [HttpGet("available")]
+    public async Task<IActionResult> GetAvailable([FromQuery]RequestFilters request,CancellationToken cancellationToken)
+    {
+        var result= await _brandService.GetAvailableAsync(request, cancellationToken);
         return Ok(result.Value);
     }
 

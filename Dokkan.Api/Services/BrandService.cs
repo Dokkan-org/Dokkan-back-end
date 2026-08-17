@@ -1,5 +1,5 @@
 ﻿using Dokkan.Api.Abstractions;
-using Dokkan.Api.Contracts.Category;
+using Dokkan.Api.Contracts.Brand;
 using Dokkan.Api.Contracts.Common;
 using Dokkan.Api.Entities;
 using Dokkan.Api.Errors;
@@ -15,14 +15,35 @@ public class BrandService(ApplicationDbContext context) : IBrandService
 {
     private readonly ApplicationDbContext _context = context;
 
-    public async Task<Result<PaginatedList<BrandResponse>>> GetAllAsync(RequestFilters filters,bool? isActive=null, CancellationToken cancellationToken = default)
+    public async Task<Result<PaginatedList<BrandResponse>>> GetAllAsync(RequestFilters filters, CancellationToken cancellationToken = default)
     {
         IQueryable<Brand> query = _context.Brands
             .AsNoTracking();
             
-  
-        if(isActive.HasValue)
-            query=query.Where(x=>x.IsActive==isActive.Value);
+
+        if (!string.IsNullOrEmpty(filters.SearchValue))
+        {
+            query = query.Where(x => x.Name.Contains(filters.SearchValue));
+        }
+
+        if (!string.IsNullOrEmpty(filters.SortColumn))
+        {
+            query = query.OrderBy($"{filters.SortColumn} {filters.SortDirection}");
+        }
+
+        var source = query
+            .ProjectToType<BrandResponse>();
+
+        var brands = await PaginatedList<BrandResponse>.CreateAsync(source, filters.PageSize, filters.PageNumber, cancellationToken);
+
+        return Result.Success(brands);
+    }
+    public async Task<Result<PaginatedList<BrandResponse>>> GetAvailableAsync(RequestFilters filters, CancellationToken cancellationToken = default)
+    {
+        IQueryable<Brand> query = _context.Brands
+            .AsNoTracking()
+            .Where(x=>x.IsActive);
+            
 
         if (!string.IsNullOrEmpty(filters.SearchValue))
         {
@@ -45,16 +66,15 @@ public class BrandService(ApplicationDbContext context) : IBrandService
 
     public async Task<Result<BrandResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
     {
-        var category= await _context.Brands
-            .Where(x=>x.Id==id)
+        var brand= await _context.Brands
+            .Where(x=>x.Id==id&&x.IsActive)
+            .ProjectToType<BrandResponse>()
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (category is null)
+        if (brand is null)
             return Result.Failure<BrandResponse>(BrandErrors.NotFound);
 
-        var response = category.Adapt<BrandResponse>();
-
-        return Result.Success(response);
+        return Result.Success(brand);
     }
 
     public async Task<Result<BrandResponse>> CreateAsync(BrandRequest request, CancellationToken cancellationToken = default)

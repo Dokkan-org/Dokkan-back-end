@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Dokkan.Api.Contracts.Category;
+namespace Dokkan.Api.Contracts.Brand;
 
 public class BrandRequesttValidator : AbstractValidator<BrandRequest>
 {
@@ -13,7 +13,7 @@ public class BrandRequesttValidator : AbstractValidator<BrandRequest>
 
         RuleFor(x => x.Description)
            .NotEmpty()
-           .Length(3, 1500)
+           .Length(5, 1500)
            .WithMessage("Description must be between 5 and 1500 characters");
 
     }

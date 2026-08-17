@@ -15,9 +15,15 @@ public class CategoriesController(ICategoryService service) : ControllerBase
     private readonly ICategoryService _categoryService = service;
 
     [HttpGet()]
-    public async Task<IActionResult> GetAll([FromQuery]RequestFilters request,bool? isActive,CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromQuery]RequestFilters request,CancellationToken cancellationToken)
     {
-        var result= await _categoryService.GetAllAsync(request,isActive, cancellationToken);
+        var result= await _categoryService.GetAllAsync(request,cancellationToken);
+        return Ok(result.Value);
+    }
+    [HttpGet("available")]
+    public async Task<IActionResult> GetAvailable([FromQuery]RequestFilters request,CancellationToken cancellationToken)
+    {
+        var result= await _categoryService.GetAvailableAsync(request,cancellationToken);
         return Ok(result.Value);
     }
 

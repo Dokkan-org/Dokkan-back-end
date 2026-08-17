@@ -15,14 +15,35 @@ public class CategoryService(ApplicationDbContext context) : ICategoryService
 {
     private readonly ApplicationDbContext _context = context;
 
-    public async Task<Result<PaginatedList<CategoryResponse>>> GetAllAsync(RequestFilters filters,bool? isActive=null, CancellationToken cancellationToken = default)
+    public async Task<Result<PaginatedList<CategoryResponse>>> GetAllAsync(RequestFilters filters, CancellationToken cancellationToken = default)
     {
         IQueryable<Category> query = _context.Categories
             .AsNoTracking();
             
-  
-        if(isActive.HasValue)
-            query=query.Where(x=>x.IsActive==isActive.Value);
+
+        if (!string.IsNullOrEmpty(filters.SearchValue))
+        {
+            query = query.Where(x => x.Name.Contains(filters.SearchValue));
+        }
+
+        if (!string.IsNullOrEmpty(filters.SortColumn))
+        {
+            query = query.OrderBy($"{filters.SortColumn} {filters.SortDirection}");
+        }
+
+        var source = query
+            .ProjectToType<CategoryResponse>();
+
+        var categories = await PaginatedList<CategoryResponse>.CreateAsync(source, filters.PageSize, filters.PageNumber, cancellationToken);
+
+        return Result.Success(categories);
+    }
+    public async Task<Result<PaginatedList<CategoryResponse>>> GetAvailableAsync(RequestFilters filters,CancellationToken cancellationToken = default)
+    {
+        IQueryable<Category> query = _context.Categories
+            .AsNoTracking()
+            .Where(x=>x.IsActive);
+              
 
         if (!string.IsNullOrEmpty(filters.SearchValue))
         {
@@ -46,15 +67,14 @@ public class CategoryService(ApplicationDbContext context) : ICategoryService
     public async Task<Result<CategoryResponse>> GetAsync(int id, CancellationToken cancellationToken = default)
     {
         var category= await _context.Categories
-            .Where(x=>x.Id==id)
+            .Where(x=>x.Id==id&&x.IsActive)
+            .ProjectToType<CategoryResponse>()
             .FirstOrDefaultAsync(cancellationToken);
 
         if (category is null)
             return Result.Failure<CategoryResponse>(CategoryErrors.NotFound);
 
-        var response = category.Adapt<CategoryResponse>();
-
-        return Result.Success(response);
+        return Result.Success(category);
     }
 
     public async Task<Result<CategoryResponse>> CreateAsync(CategoryRequest request, CancellationToken cancellationToken = default)

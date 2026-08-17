@@ -1,5 +1,7 @@
 ﻿using Dokkan.Api.Contracts.Authentication;
+using Dokkan.Api.Contracts.Brand;
 using Dokkan.Api.Contracts.Category;
+using Dokkan.Api.Contracts.Products;
 using Dokkan.Api.Contracts.Users;
 using Dokkan.Api.Entities;
 using Mapster;
@@ -18,5 +20,14 @@ public class MappingConfigurations : IRegister
 
         config.NewConfig<BrandRequest, Brand>()
             .Map(dest => dest.IsActive, _ => true);
+
+        config.NewConfig<Product, ProductResponse>()
+            .Map(dest => dest.Brand, src => src.Brand.Name)
+            .Map(dest => dest.Category, src => src.Category.Name);
+
+
+        config.NewConfig<ProductRequest, Product>()
+            .Map(dest => dest.IsActive, _ => true);
+
     }
 }
